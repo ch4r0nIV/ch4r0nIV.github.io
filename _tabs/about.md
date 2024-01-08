@@ -5,4 +5,4 @@ order: 4
 ---
 
 
-Hello, friend.
+"In this world, there's always something we don't know. And that's what makes us vulnerable."
