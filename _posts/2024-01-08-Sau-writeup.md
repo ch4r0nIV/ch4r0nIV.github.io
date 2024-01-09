@@ -9,6 +9,8 @@ math: true
 mermaid: true
 ---
 
+En esta máquina, abordamos múltiples vulnerabilidades que abarcan desde la exposición de servicios mal configurados, pasando por vulnerabilidades de SSRF en aplicaciones web, hasta vulnerabilidades de ejecución remota de código (RCE).
+
 ## Reconocimiento (Reconnaissance)
 
 Verificación de Conectividad con Ping:
