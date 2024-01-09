@@ -1,20 +1,12 @@
 ---
 title: Drive - Hack The Box
-date: 2023-08-15
-#classes: wide
-#toc: true
-#toc_label: "Contenido"
-#toc_icon: "fire"
-header:
-  teaser: /assets/img/HackTheBox/Driver/Driver-icon.png
-  teaser_home_page: true
-  icon: /assets/images/hackthebox.webp
-categories:
-  - hackthebox
-tags:
-  - Password Guessing
-  - SCF Malicious File
-  - Print Spooler Local Privilege Escalation (PrintNightmare) [CVE-2021-1675]
+author: r4v3nC0d3
+date: 2023-08-15 11:33:00 +0800
+categories: [Hacking, HackTheBox]
+tags: [password guessing, scf malicious file, print spooler local privilege escalation (printNightmare) cve-2021-1675]
+# pin: true
+math: true
+mermaid: true
 ---
 
 
