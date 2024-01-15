@@ -258,7 +258,7 @@ Ahora en este formato reduciendo y manipulando el total de columnas y filas en l
 
 ![](/assets/img/HackTheBox/Sau/rooted.png)
 
-## R00T3D
+## R00T3D by ch4r0niv
 
 
 
